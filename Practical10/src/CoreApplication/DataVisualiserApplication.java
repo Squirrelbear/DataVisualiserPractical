@@ -33,15 +33,16 @@ public class DataVisualiserApplication {
      * @param smallMode When enabled the size of the window will be made smaller to accommodate smaller screens.
      * @param sortingAlgorithms A list of classes to load from the SortingAlgorithms package containing SortAlgorithm classes.
      * @param searchingAlgorithms A list of classes to load from the SearchingAlgorithms package containing SearchAlgorithm classes.
+     * @param ignoreClassNotFound  Ignores failed sorting/searching algorithms that do not exist without throwing an error.
      */
-    public DataVisualiserApplication(boolean smallMode, String[] sortingAlgorithms, String[] searchingAlgorithms) {
+    public DataVisualiserApplication(boolean smallMode, String[] sortingAlgorithms, String[] searchingAlgorithms, boolean ignoreClassNotFound) {
         JFrame frame = new JFrame("Data Visualiser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         visualiserPanel = new VisualiserPanel(smallMode ? 600 : 800, smallMode ? 0 : 300);
         frame.getContentPane().add(visualiserPanel, BorderLayout.WEST);
-        buttonPanel = new ButtonPanel(this, smallMode ? 26 : 37, sortingAlgorithms, searchingAlgorithms);
+        buttonPanel = new ButtonPanel(this, smallMode ? 26 : 37, sortingAlgorithms, searchingAlgorithms, ignoreClassNotFound);
         frame.getContentPane().add(buttonPanel, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
@@ -54,7 +55,7 @@ public class DataVisualiserApplication {
      * @param smallMode When enabled the size of the window will be made smaller to accommodate smaller screens.
      */
     public DataVisualiserApplication(boolean smallMode) {
-        this(smallMode, ClassCollectorUtility.getAllSortingAlgorithms(), ClassCollectorUtility.getAllSearchingAlgorithms());
+        this(smallMode, ClassCollectorUtility.getAllSortingAlgorithms(), ClassCollectorUtility.getAllSearchingAlgorithms(), false);
     }
 
     /**

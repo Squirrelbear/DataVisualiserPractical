@@ -109,14 +109,15 @@ public class ButtonPanel extends JPanel implements ActionListener, ChangeListene
      * @param elementHeight Preferred element height. Recommend ~25 for small, or 37 for default.
      * @param sortingAlgorithmClasses A list of names that MUST match the classes under SortingAlgorithms.className.
      * @param searchingAlgorithmClasses A list of names that MUST match the classes under SearchingAlgorithms.className.
+     * @param ignoreClassNotFound  Ignores failed sorting/searching algorithms that do not exist without throwing an error.
      */
-    public ButtonPanel(DataVisualiserApplication main, int elementHeight, String[] sortingAlgorithmClasses, String[] searchingAlgorithmClasses) {
+    public ButtonPanel(DataVisualiserApplication main, int elementHeight, String[] sortingAlgorithmClasses, String[] searchingAlgorithmClasses, boolean ignoreClassNotFound) {
         DEFAULT_ELEMENT_HEIGHT = elementHeight;
         this.main = main;
         setPreferredSize(new Dimension(220, VisualiserPanel.PANEL_HEIGHT));
         setBackground(Color.LIGHT_GRAY);
-        createSortAlgorithms(sortingAlgorithmClasses);
-        createSearchAlgorithms(searchingAlgorithmClasses);
+        createSortAlgorithms(sortingAlgorithmClasses, ignoreClassNotFound);
+        createSearchAlgorithms(searchingAlgorithmClasses, ignoreClassNotFound);
         historyViewerDialog = new HistoryViewerDialog();
         createComponents();
         setButtonsEnabled(true);
@@ -163,13 +164,14 @@ public class ButtonPanel extends JPanel implements ActionListener, ChangeListene
      * Creates all the available sorting algorithms and generates a list of Strings to represent them.
      *
      * @param classNames A list of names that MUST match the classes under SortingAlgorithms.className.
+     * @param ignoreClassNotFound  Ignores failed algorithms that do not exist without throwing an error.
      */
-    public void createSortAlgorithms(String[] classNames) {
+    public void createSortAlgorithms(String[] classNames, boolean ignoreClassNotFound) {
         sortAlgorithmList = new ArrayList<>();
         StringBuilder failedNameList = new StringBuilder();
 
         for(String className : classNames) {
-            boolean success = attemptLoadSortByClassName(className);
+            boolean success = attemptLoadSortByClassName(className, ignoreClassNotFound);
             if(!success) {
                 failedNameList.append("\n").append(className);
             }
@@ -193,9 +195,10 @@ public class ButtonPanel extends JPanel implements ActionListener, ChangeListene
      * Attempts to use reflection to generate a class of the specified name.
      *
      * @param className The name of a class that must conform to SortingAlgorithms.className.
+     * @param ignoreClassNotFound  Ignores failed algorithms that do not exist without throwing an error.
      * @return True if the object was successfully created.
      */
-    private boolean attemptLoadSortByClassName(String className) {
+    private boolean attemptLoadSortByClassName(String className, boolean ignoreClassNotFound) {
         try {
             Class<?> clazz = Class.forName("SortingAlgorithms." + className);
             if(!SortAlgorithm.class.isAssignableFrom(clazz)) {
@@ -207,7 +210,12 @@ public class ButtonPanel extends JPanel implements ActionListener, ChangeListene
             sortAlgorithmList.add(object);
             return true;
         } catch(ClassNotFoundException e) {
-            System.out.println("Class Not Found Exception: " + e.getMessage());
+            if(ignoreClassNotFound) {
+                System.out.println("The Sorting class \"" + className + "\" was not found. This may be for a later checkpoint.");
+                return true;
+            } else {
+                System.out.println("Class Not Found Exception: " + e.getMessage());
+            }
         } catch (InstantiationException e) {
             System.out.println("Instantiation Exception: " + e.getMessage());
         } catch (InvocationTargetException e) {
@@ -224,13 +232,14 @@ public class ButtonPanel extends JPanel implements ActionListener, ChangeListene
      * Creates all the available searching algorithms and generates a list of Strings to represent them.
      *
      * @param classNames A list of names that MUST match the classes under SearchingAlgorithms.className.
+     * @param ignoreClassNotFound  Ignores failed algorithms that do not exist without throwing an error.
      */
-    public void createSearchAlgorithms(String[] classNames) {
+    public void createSearchAlgorithms(String[] classNames, boolean ignoreClassNotFound) {
         searchAlgorithmList = new ArrayList<>();
         StringBuilder failedNameList = new StringBuilder();
 
         for(String className : classNames) {
-            boolean success = attemptLoadSearchByClassName(className);
+            boolean success = attemptLoadSearchByClassName(className, ignoreClassNotFound);
             if(!success) {
                 failedNameList.append("\n").append(className);
             }
@@ -254,9 +263,10 @@ public class ButtonPanel extends JPanel implements ActionListener, ChangeListene
      * Attempts to use reflection to generate a class of the specified name.
      *
      * @param className The name of a class that must conform to SortingAlgorithms.className.
+     * @param ignoreClassNotFound  Ignores failed algorithms that do not exist without throwing an error.
      * @return True if the object was successfully created.
      */
-    private boolean attemptLoadSearchByClassName(String className) {
+    private boolean attemptLoadSearchByClassName(String className, boolean ignoreClassNotFound) {
         try {
             Class<?> clazz = Class.forName("SearchingAlgorithms." + className);
             if(!SearchAlgorithm.class.isAssignableFrom(clazz)) {
@@ -268,7 +278,12 @@ public class ButtonPanel extends JPanel implements ActionListener, ChangeListene
             searchAlgorithmList.add(object);
             return true;
         } catch(ClassNotFoundException e) {
-            System.out.println("Class Not Found Exception: " + e.getMessage());
+            if(ignoreClassNotFound) {
+                System.out.println("The Searching class \"" + className + "\" was not found. This may be for a later checkpoint.");
+                return true;
+            } else {
+                System.out.println("Class Not Found Exception: " + e.getMessage());
+            }
         } catch (InstantiationException e) {
             System.out.println("Instantiation Exception: " + e.getMessage());
         } catch (InvocationTargetException e) {

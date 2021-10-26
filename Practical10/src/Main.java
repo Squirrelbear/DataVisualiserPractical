@@ -12,7 +12,7 @@ import java.util.List;
  * Entry point to start the application.
  *
  * @author Peter Mitchell
- * @version 2021.2
+ * @version 2021.3
  */
 public class Main {
     /**
@@ -21,17 +21,19 @@ public class Main {
      * @param args Not used.
      */
     public static void main(String[] args) {
-        // Use this by default, change to true if the window is too large for your screen resolution.
-        launchWithAllAlgorithms(false);
+        // Change smallMode to true if the window is too large for your screen.
+        boolean smallMode = false;
+        // launchMode = 0 is default, but may not work for everyone. Change to 1 if 0 does not work for you.
+        // If 1 also does not work for you, use 2, and you will need to uncomment lines in getAlgorithm()
+        // at the bottom of this file. The lines are marked for the ones you need for each task from 2 to 4.
+        int launchMode = 1;
 
-        // If you want to launch with only a specific set of algorithms you can call the following method instead.
-        // Modify the arrays in the method to suit as needed.
-        //launchWithCustomListedAlgorithms(false);
-
-        // If you find that neither of the above methods work to show the list of algorithms in a dropdown
-        // use the below method instead and make sure to comment out the other two. You will need to modify
-        // the getAlgorithms() method at the bottom of this file when you get to Task 2 to 4.
-        //launchWithNoReflection(false);
+        switch(launchMode) {
+            case 0 -> launchWithAllAlgorithms(smallMode);
+            case 1 -> launchWithCustomListedAlgorithms(smallMode);
+            case 2 -> launchWithNoReflection(smallMode);
+            default -> System.out.println("INVALID LAUNCH MODE. Set it to 0, 1, or 2.");
+        }
     }
 
     /**
@@ -54,16 +56,11 @@ public class Main {
     private static void launchWithCustomListedAlgorithms(boolean smallMode) {
         // Add or remove any class (file) names from this list.
         // Make sure that any you list here are inside the SortingAlgorithms package or it will fail to load them!
-        String[] sortingAlgorithms = new String[]{"BubbleSort", "BubbleSortSlow"
-                                    //, "SelectionSort" // Uncomment this line for Task 2+
-                                    //, "InsertionSort" // Uncomment this line for Task 3+
-        };
+        String[] sortingAlgorithms = new String[]{"BubbleSort", "BubbleSortSlow", "SelectionSort", "InsertionSort" };
 
         // Same as above, but make sure these are in the SearchingAlgorithms package.
-        String[] searchingAlgorithms = new String[]{"LinearSearch"
-                                    //, "BinarySearch" // Uncomment this line for Task 4+
-        };
-        new DataVisualiserApplication(smallMode, sortingAlgorithms, searchingAlgorithms);
+        String[] searchingAlgorithms = new String[]{"LinearSearch", "BinarySearch"};
+        new DataVisualiserApplication(smallMode, sortingAlgorithms, searchingAlgorithms, true);
     }
 
     /**
